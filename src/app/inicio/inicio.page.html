@@ -1,0 +1,42 @@
+<!--Pantalla 1 del inicio-->
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>TaskMate</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Saludo personalizado -->
+  <div class="welcome-section">
+    <h2>¡Hola, José Antonio! 👋</h2>
+    <p>Tienes <strong>0 tareas</strong> pendientes hoy.</p>
+  </div>
+
+  <!-- Tarjeta de resumen -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Developer</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Organiza tu dia y avanza una tarea a la vez.</p>
+      <ion-grid>
+        <ion-row>
+          <ion-col class="stat-col">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+          </ion-col>
+          <ion-col class="stat-col">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Completadas</div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button color="primary" aria-label="Agregar">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

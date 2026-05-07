@@ -1,0 +1,50 @@
+<!--Pantalla 3 del perfil-->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mi Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Avatar y nombre -->
+  <div class="profile-header">
+    <ion-avatar class="profile-avatar">
+      <img src="https://ui-avatars.com/api/?name=Tu+Nombre&background=6C63FF&color=fff&size=128" />
+    </ion-avatar>
+    <h2>José Antonio Sánchez</h2>
+    <p> 2º DAM</p>
+    <ion-badge color="primary">Developer en formación</ion-badge>
+  </div>
+
+  <!-- Tecnologías que conoces -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-subtitle>Stack tecnológico</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-chip color="primary"><ion-label>HTML/CSS</ion-label></ion-chip>
+      <ion-chip color="secondary"><ion-label>JavaScript</ion-label></ion-chip>
+      <ion-chip color="tertiary"><ion-label>Angular</ion-label></ion-chip>
+      <ion-chip><ion-label>Ionic</ion-label></ion-chip>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Lista de info -->
+  <ion-list>
+    <ion-item>
+      <ion-icon name="school" slot="start" color="primary"></ion-icon>
+      <ion-label>
+        <h3>Centro</h3>
+        <p>IES La Puebla — Almería</p>
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+      <ion-label>
+        <h3>Curso</h3>
+        <p>2025/2026</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,10 @@
+.welcome-section {
+    padding: 16px 0;
+    h2 { font-size: 1.5rem; font-weight: 700; }
+    p { color: var(--ion-color-medium); }
+  }
+  .stat-col {
+    text-align: center;
+    .stat-number { font-size: 2rem; font-weight: 700; color: var(--ion-color-primary); }
+    .stat-label { font-size: 0.8rem; color: var(--ion-color-medium); }
+  }

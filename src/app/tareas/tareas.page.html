@@ -1,0 +1,33 @@
+<!--Pantalla 2 de las tareas-->
+
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Tareas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Tareas</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  @if (tareas.length === 0) {
+    <div class="empty-state" role="status" aria-live="polite">
+      <ion-icon name="clipboard-outline" class="empty-state__icon" aria-hidden="true"></ion-icon>
+      <h2 class="empty-state__title">No hay tareas</h2>
+      <p class="empty-state__text">
+        Tu lista está vacía. Ve a Inicio y pulsa el botón <strong>+</strong> para añadir la primera.
+      </p>
+    </div>
+  } @else {
+    <ion-list [inset]="true" lines="full">
+      @for (tarea of tareas; track tarea.id) {
+        <ion-item>
+          <ion-label>{{ tarea.titulo }}</ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>

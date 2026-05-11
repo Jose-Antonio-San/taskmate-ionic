@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import {
   IonBadge,
   IonCheckbox,
@@ -16,13 +17,14 @@ import {
   IonSearchbar,
   IonSegment,
   IonSegmentButton,
+  IonSpinner,
   IonTitle,
   IonToolbar,
   ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add } from 'ionicons/icons';
+import { add, clipboardOutline } from 'ionicons/icons';
 import { AddTaskModalComponent } from '../components/add-task-modal/add-task-modal.component';
 import { Task } from '../models/task.models';
 import { TaskService } from '../models/services/task.service';
@@ -50,12 +52,14 @@ import { TaskService } from '../models/services/task.service';
     IonFab,
     IonFabButton,
     IonIcon,
+    IonSpinner,
   ],
 })
 export class TareasPage {
   tasks: Task[] = [];
   filteredTasks: Task[] = [];
   selectedFilter = 'all';
+  loadingTasks = false;
 
   constructor(
     private taskService: TaskService,
@@ -63,16 +67,40 @@ export class TareasPage {
     private modalCtrl: ModalController,
     private toastCtrl: ToastController
   ) {
-    addIcons({ add });
+    addIcons({ add, clipboardOutline });
   }
 
   ionViewWillEnter() {
-    this.tasks = this.taskService.getTasks();
-    this.applyFilter();
+    this.refreshTasks();
   }
 
-  filterTasks(event: any) {
-    const query = event.target.value?.toLowerCase() || '';
+  private async showApiErrorToast() {
+    const toast = await this.toastCtrl.create({
+      message: 'La API no responde o ha fallado. Comprueba el servidor en el puerto 3000.',
+      duration: 4000,
+      color: 'danger',
+    });
+    await toast.present();
+  }
+
+  private refreshTasks() {
+    this.loadingTasks = true;
+    this.taskService
+      .getTasks()
+      .pipe(finalize(() => (this.loadingTasks = false)))
+      .subscribe({
+        next: (tasks) => {
+          this.tasks = tasks;
+          this.applyFilter();
+        },
+        error: async () => {
+          await this.showApiErrorToast();
+        },
+      });
+  }
+
+  filterTasks(event: CustomEvent<{ value?: string | null }>) {
+    const query = (event.detail.value ?? '').toLowerCase();
     this.filteredTasks = this.tasks.filter((t) => t.title.toLowerCase().includes(query));
   }
 
@@ -83,11 +111,24 @@ export class TareasPage {
   }
 
   onToggle(task: Task) {
-    this.taskService.setCompleted(task.id, task.completed);
-    this.applyFilter();
+    const next = task.completed;
+    this.taskService.setCompleted(task.id, next).subscribe({
+      next: () => this.refreshTasks(),
+      error: async () => {
+        task.completed = !next;
+        const toast = await this.toastCtrl.create({
+          message: 'No se pudo guardar en la API',
+          duration: 2000,
+          color: 'danger',
+        });
+        await toast.present();
+      },
+    });
   }
 
-  goToDetail(id: number) { this.router.navigate(['/task-detail', id]); }
+  goToDetail(id: number) {
+    void this.router.navigate(['/task-detail', id]);
+  }
 
   async openAddModal() {
     const modal = await this.modalCtrl.create({ component: AddTaskModalComponent });
@@ -96,17 +137,21 @@ export class TareasPage {
     const { data } = await modal.onWillDismiss();
 
     if (data) {
-      this.taskService.addTask({ ...data, completed: false });
-      this.tasks = this.taskService.getTasks();
-      this.applyFilter();
-
-      const toast = await this.toastCtrl.create({
-        message: '✅ Tarea creada correctamente',
-        duration: 2000,
-        position: 'bottom',
-        color: 'success',
+      this.taskService.addTask({ ...data, completed: false }).subscribe({
+        next: async () => {
+          this.refreshTasks();
+          const toast = await this.toastCtrl.create({
+            message: '✅ Tarea creada correctamente',
+            duration: 2000,
+            position: 'bottom',
+            color: 'success',
+          });
+          await toast.present();
+        },
+        error: async () => {
+          await this.showApiErrorToast();
+        },
       });
-      await toast.present();
     }
   }
 }

@@ -1,84 +1,75 @@
-//Servicio para gestionar las tareas en el localStorage
-
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, map, of, throwError } from 'rxjs';
+import { ApiService, CreateTaskBody, TaskApiDto } from '../../services/api.service';
 import { Task } from '../task.models';
 
+/**
+ * Lógica de dominio de tareas: delega HTTP en {@link ApiService}
+ * (HttpClient devuelve Observables → subscribe o async pipe).
+ */
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-  private tasks: Task[] = [];
-  private nextId = 1;
-  private readonly STORAGE_KEY = 'taskmate_tasks';
-  private readonly NEXT_ID_KEY = 'taskmate_nextId';
+  private readonly api = inject(ApiService);
 
-  constructor() {
-    this.loadFromStorage();
-  }
-
-  private saveToStorage(): void {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.tasks));
-    localStorage.setItem(this.NEXT_ID_KEY, String(this.nextId));
-  }
-
-  private loadFromStorage(): void {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    const savedId = localStorage.getItem(this.NEXT_ID_KEY);
-    if (saved) {
-      try {
-        this.tasks = JSON.parse(saved).map((t: Task) => ({
-          ...t,
-          createdAt: new Date(t.createdAt as unknown as string),
-        }));
-      } catch {
-        this.tasks = [];
-      }
-    }
-    if (savedId) {
-      const parsed = parseInt(savedId, 10);
-      if (!Number.isNaN(parsed)) this.nextId = parsed;
-    }
-  }
-
-  getTasks(): Task[] {
-    return [...this.tasks];
-  }
-
-  getTaskById(id: number): Task | undefined {
-    return this.tasks.find((t) => t.id === id);
-  }
-
-  addTask(data: Omit<Task, 'id' | 'createdAt'>): Task {
-    const task: Task = { ...data, id: this.nextId++, createdAt: new Date() };
-    this.tasks.push(task);
-    this.saveToStorage();
-    return task;
-  }
-
-  toggleComplete(id: number): void {
-    const task = this.tasks.find((t) => t.id === id);
-    if (task) {
-      task.completed = !task.completed;
-      this.saveToStorage();
-    }
-  }
-
-  setCompleted(id: number, completed: boolean): void {
-    const task = this.tasks.find((t) => t.id === id);
-    if (task) {
-      task.completed = completed;
-      this.saveToStorage();
-    }
-  }
-
-  deleteTask(id: number): void {
-    this.tasks = this.tasks.filter((t) => t.id !== id);
-    this.saveToStorage();
-  }
-
-  getStats() {
+  private normalize(dto: TaskApiDto): Task {
     return {
-      total: this.tasks.length,
-      completed: this.tasks.filter((t) => t.completed).length,
-      pending: this.tasks.filter((t) => !t.completed).length,
+      id: dto.id,
+      title: dto.title,
+      description: dto.description ?? undefined,
+      priority: dto.priority,
+      completed: dto.completed,
+      category: dto.category ?? undefined,
+      createdAt: new Date(dto.createdAt),
+    };
+  }
+
+  getTasks(): Observable<Task[]> {
+    return this.api.getTasks().pipe(
+      map((rows) => rows.map((r) => this.normalize(r))),
+      catchError((err) => {
+        console.error('TaskService.getTasks', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  getTaskById(id: number): Observable<Task | null> {
+    return this.api.getTaskById(id).pipe(
+      map((r) => this.normalize(r)),
+      catchError((err) => {
+        if (err?.status === 404) {
+          return of(null);
+        }
+        console.error('TaskService.getTaskById', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  addTask(data: Omit<Task, 'id' | 'createdAt'>): Observable<Task> {
+    const body: CreateTaskBody = {
+      title: data.title,
+      description: data.description ?? '',
+      priority: data.priority,
+      completed: data.completed,
+      category: data.category ?? null,
+    };
+    return this.api.createTask(body).pipe(map((r) => this.normalize(r)));
+  }
+
+  setCompleted(id: number, completed: boolean): Observable<Task> {
+    return this.api.updateTask(id, { completed }).pipe(map((r) => this.normalize(r)));
+  }
+
+  deleteTask(id: number): Observable<void> {
+    return this.api.deleteTask(id).pipe(map(() => undefined));
+  }
+
+  computeStats(tasks: Task[]) {
+    return {
+      total: tasks.length,
+      completed: tasks.filter((t) => t.completed).length,
+      pending: tasks.filter((t) => !t.completed).length,
     };
   }
 }

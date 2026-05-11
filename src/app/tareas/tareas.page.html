@@ -7,41 +7,43 @@
 </ion-header>
 
 <ion-content>
-  <!-- Barra de búsqueda -->
-  <ion-searchbar placeholder="Buscar tarea..." (ionInput)="filterTasks($event)"></ion-searchbar>
-
-  <!-- Segmento de filtros -->
-  <ion-segment [(ngModel)]="selectedFilter" (ionChange)="applyFilter()">
-    <ion-segment-button value="all"><ion-label>Todas</ion-label></ion-segment-button>
-    <ion-segment-button value="pending"><ion-label>Pendientes</ion-label></ion-segment-button>
-    <ion-segment-button value="done"><ion-label>Hechas</ion-label></ion-segment-button>
-  </ion-segment>
-
-  <!-- Lista de tareas -->
-  <ion-list>
-    <ion-item *ngFor="let task of filteredTasks" button (click)="goToDetail(task.id)">
-      <ion-checkbox slot="start" [(ngModel)]="task.completed" (ngModelChange)="onToggle(task)" (click)="$event.stopPropagation()"></ion-checkbox>
-      <ion-label [class.completed]="task.completed">
-        <h2>{{ task.title }}</h2>
-        <p>{{ task.description }}</p>
-      </ion-label>
-      <ion-badge slot="end" [color]="task.priority === 'Alta' ? 'danger' : task.priority === 'Media' ? 'warning' : 'success'">
-        {{ task.priority }}
-      </ion-badge>
-    </ion-item>
-  </ion-list>
-
-  <!-- Estado vacío -->
-  <div *ngIf="filteredTasks.length === 0" class="empty-state ion-text-center ion-padding">
-    <ion-icon name="clipboard-outline" size="large" color="medium"></ion-icon>
-    <h3>No hay tareas</h3>
-    <p>Crea tu primera tarea con el botón +</p>
+  <div *ngIf="loadingTasks" class="ion-text-center ion-padding">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p class="ion-margin-top">Cargando desde la API…</p>
   </div>
 
-  <!-- FAB para añadir -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="primary" (click)="openAddModal()">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+  <ng-container *ngIf="!loadingTasks">
+    <ion-searchbar placeholder="Buscar tarea..." (ionInput)="filterTasks($event)"></ion-searchbar>
+
+    <ion-segment [(ngModel)]="selectedFilter" (ionChange)="applyFilter()">
+      <ion-segment-button value="all"><ion-label>Todas</ion-label></ion-segment-button>
+      <ion-segment-button value="pending"><ion-label>Pendientes</ion-label></ion-segment-button>
+      <ion-segment-button value="done"><ion-label>Hechas</ion-label></ion-segment-button>
+    </ion-segment>
+
+    <ion-list>
+      <ion-item *ngFor="let task of filteredTasks" button (click)="goToDetail(task.id)">
+        <ion-checkbox slot="start" [(ngModel)]="task.completed" (ngModelChange)="onToggle(task)" (click)="$event.stopPropagation()"></ion-checkbox>
+        <ion-label [class.completed]="task.completed">
+          <h2>{{ task.title }}</h2>
+          <p>{{ task.description }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="task.priority === 'Alta' ? 'danger' : task.priority === 'Media' ? 'warning' : 'success'">
+          {{ task.priority }}
+        </ion-badge>
+      </ion-item>
+    </ion-list>
+
+    <div *ngIf="filteredTasks.length === 0" class="empty-state ion-text-center ion-padding">
+      <ion-icon name="clipboard-outline" size="large" color="medium"></ion-icon>
+      <h3>No hay tareas</h3>
+      <p>Crea tu primera tarea con el botón +</p>
+    </div>
+
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button color="primary" (click)="openAddModal()">
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </ng-container>
 </ion-content>

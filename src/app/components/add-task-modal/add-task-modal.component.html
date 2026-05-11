@@ -1,0 +1,39 @@
+  <!-- Modal para añadir una nueva tarea -->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nueva tarea</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-label position="stacked">Titulo</ion-label>
+    <ion-input [(ngModel)]="title" placeholder="Ej. Estudiar Angular"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Descripcion</ion-label>
+    <ion-textarea
+      [(ngModel)]="description"
+      placeholder="Detalles de la tarea"
+      rows="4"
+    ></ion-textarea>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Prioridad</ion-label>
+    <ion-select [(ngModel)]="priority">
+      <ion-select-option value="Alta">Alta</ion-select-option>
+      <ion-select-option value="Media">Media</ion-select-option>
+      <ion-select-option value="Baja">Baja</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="block" class="ion-margin-top" (click)="save()">
+    Guardar tarea
+  </ion-button>
+</ion-content>

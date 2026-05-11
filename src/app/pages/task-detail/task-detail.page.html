@@ -1,0 +1,31 @@
+<!--Pantalla de detalle de la tarea-->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab2"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="deleteTask()" color="danger">
+        <ion-icon name="trash"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" *ngIf="task">
+  <ion-badge [color]="task.priority === 'Alta' ? 'danger' : 'warning'">
+    {{ task.priority | uppercase }}
+  </ion-badge>
+  <h1 class="ion-margin-top">{{ task.title }}</h1>
+  <p>{{ task.description || 'Sin descripción' }}</p>
+  <ion-note>Creada el {{ task.createdAt | date:'dd/MM/yyyy HH:mm' }}</ion-note>
+
+  <ion-button expand="block" class="ion-margin-top"
+    [color]="task.completed ? 'medium' : 'success'"
+    (click)="toggleComplete()">
+    <ion-icon [name]="task.completed ? 'refresh' : 'checkmark'" slot="start"></ion-icon>
+    {{ task.completed ? 'Marcar como pendiente' : 'Marcar como completada' }}
+  </ion-button>
+</ion-content>

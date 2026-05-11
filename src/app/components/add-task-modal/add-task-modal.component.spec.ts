@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/standalone';
 
 import { AddTaskModalComponent } from './add-task-modal.component';
 
@@ -8,9 +8,11 @@ describe('AddTaskModalComponent', () => {
   let fixture: ComponentFixture<AddTaskModalComponent>;
 
   beforeEach(waitForAsync(() => {
+    const modalCtrlMock = jasmine.createSpyObj<ModalController>('ModalController', ['dismiss']);
+
     TestBed.configureTestingModule({
-      declarations: [ AddTaskModalComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [AddTaskModalComponent],
+      providers: [{ provide: ModalController, useValue: modalCtrlMock }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddTaskModalComponent);

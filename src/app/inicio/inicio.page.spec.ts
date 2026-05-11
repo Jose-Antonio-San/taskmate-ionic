@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { provideIonicAngular } from '@ionic/angular/standalone';
 
 import { Tab1Page } from './inicio.page';
 
@@ -7,6 +9,11 @@ describe('Tab1Page', () => {
   let fixture: ComponentFixture<Tab1Page>;
 
   beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Tab1Page],
+      providers: [provideIonicAngular(), provideRouter([])],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(Tab1Page);
     component = fixture.componentInstance;
     fixture.detectChanges();

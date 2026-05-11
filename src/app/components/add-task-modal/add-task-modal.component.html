@@ -1,4 +1,4 @@
-  <!-- Modal para añadir una nueva tarea -->
+<!-- Modal para añadir una nueva tarea -->
 
 <ion-header>
   <ion-toolbar>
@@ -10,30 +10,53 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item>
-    <ion-label position="stacked">Titulo</ion-label>
-    <ion-input [(ngModel)]="title" placeholder="Ej. Estudiar Angular"></ion-input>
-  </ion-item>
+  <form [formGroup]="taskForm">
+    <ion-item
+      [class.ion-invalid]="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+    >
+      <ion-label position="floating">Título *</ion-label>
+      <ion-input formControlName="title"></ion-input>
+      @if (taskForm.get('title')?.invalid && taskForm.get('title')?.touched && titleError) {
+        <ion-note slot="error" color="danger">{{ titleError }}</ion-note>
+      }
+    </ion-item>
 
-  <ion-item>
-    <ion-label position="stacked">Descripcion</ion-label>
-    <ion-textarea
-      [(ngModel)]="description"
-      placeholder="Detalles de la tarea"
-      rows="4"
-    ></ion-textarea>
-  </ion-item>
+    <ion-item
+      class="ion-margin-top"
+      [class.ion-invalid]="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
+    >
+      <ion-label position="floating">Descripción</ion-label>
+      <ion-textarea formControlName="description" rows="3"></ion-textarea>
+      @if (taskForm.get('description')?.invalid && taskForm.get('description')?.touched && descriptionError) {
+        <ion-note slot="error" color="danger">{{ descriptionError }}</ion-note>
+      }
+    </ion-item>
 
-  <ion-item>
-    <ion-label>Prioridad</ion-label>
-    <ion-select [(ngModel)]="priority">
-      <ion-select-option value="Alta">Alta</ion-select-option>
-      <ion-select-option value="Media">Media</ion-select-option>
-      <ion-select-option value="Baja">Baja</ion-select-option>
-    </ion-select>
-  </ion-item>
+    <ion-item class="ion-margin-top">
+      <ion-label>Prioridad</ion-label>
+      <ion-select formControlName="priority" interface="popover">
+        <ion-select-option value="alta">🔴 Alta</ion-select-option>
+        <ion-select-option value="media">🟡 Media</ion-select-option>
+        <ion-select-option value="baja">🟢 Baja</ion-select-option>
+      </ion-select>
+    </ion-item>
 
-  <ion-button expand="block" class="ion-margin-top" (click)="save()">
-    Guardar tarea
-  </ion-button>
+    <ion-item class="ion-margin-top">
+      <ion-label>Categoría</ion-label>
+      <ion-select formControlName="category" interface="popover">
+        <ion-select-option value="personal">Personal</ion-select-option>
+        <ion-select-option value="trabajo">Trabajo</ion-select-option>
+        <ion-select-option value="estudio">Estudio</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-button
+      expand="block"
+      class="ion-margin-top"
+      (click)="save()"
+      [disabled]="taskForm.invalid"
+    >
+      Guardar Tarea
+    </ion-button>
+  </form>
 </ion-content>
